@@ -22,7 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', LoginView.as_view(), name="login"),
     path('register/', RegisterView.as_view()),
-    path('', lambda r: redirect("login")),
+    path('', lambda r: redirect("article-list")),
     path('article/', ArticleView.as_view()),
     path("post-article/", PostArticleView.as_view(),),
     path("article-list/", ArticleListView.as_view(), name="article-list"),
