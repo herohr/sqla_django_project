@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>文章列表</title>
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="col-lg-12">
+            <div class="row page-header" id="head-title">
+                <div class="col-lg-3">
+                    <h1 class="text-primary">SAKULA博客</h1>
+                </div>
+
+                <div class="col-lg-3">
+                      <a href="/post-article/">
+                        <h3 class="text-info">添加新的博客</h3>
+                      </a>
+                </div>
+
+                <div id="userInfo">
+                    <div v-if="userLogin">
+                        <div class="col-lg-1">
+                            <h3 class="text-info"> [[username]]</h3>
+                        </div>
+
+                        <div class="col-lg-1">
+                            <h3 class="text-info" v-on:click="logout">登出</h3>
+                        </div>
+                    </div>
+                    <div v-else>
+                        <div class="col-lg-1">
+                              <a href="/register/">
+                                <h3 class="text-info">注册</h3>
+                              </a>
+                        </div>
+
+                        <div class="col-lg-1">
+                              <a href="/login/">
+                                <h3 class="text-info">登录</h3>
+                              </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+
+
+                <div class="panel-group" id="accordion">
+                    <div v-for="article in articles">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                    <p class="text-primary" style="color: #0094ff; font-size: 30px;">
+                                        <a data-toggle="collapse" data-parent="#accordion" v-bind:href="'#content' + article.id">[[ article.title ]]</a>
+                                    </p>
+                                </div>
+                                <div class="col-lg-4">
+                                    <h5 class="text-primary" style="color: #0094ff;">创建时间：[[ article.create_time ]]</h5>
+                                    </div>
+
+                                    <div class="col-lg-2">
+                                        <h5 class="text-primary" style="color: #0094ff;">作者：[[ article.author_name ]]</h5>
+                                    </div>
+
+                                    <div class="col-lg-1">
+                                        <button class="btn btn-warning" v-bind:id="article.id" v-on:click="onDeleteClick">
+                                            删除
+                                        </button>
+                                </div>
+                                </div>
+                            </div>
+
+                            <div class="panel-collapse collapse in" v-bind:id="'content' + article.id">
+                                <div class="panel-body" >
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                             <span v-html="article.content"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <script>
+        var serverLocation = "/api/";
+
+        var vue = new Vue({
+          el: '#accordion',
+          delimiters:['[[', ']]'],
+          data: {
+            articles: []
+          },
+
+          methods: {
+              onDeleteClick: function (event) {
+                  var article_id = event.target.id;
+                  $.ajax({
+                      url: serverLocation + "article/",
+                      method: "delete",
+                      dataType: "json",
+                      data: JSON.stringify({
+                          "article_id": article_id
+                      }),
+                      success: function (resp) {
+                          alert("删除成功!");
+                          console.log(resp);
+                          window.location.reload()
+                      },
+                      error: function (resp) {
+                          alert(resp.responseText)
+                      }
+                  })
+              }
+          }
+        });
+
+        $.getJSON(serverLocation + "article/")
+            .done(function (data) {
+                console.log(data);
+                for (const article of data.articles) {
+                    vue.articles.push(article)
+                }
+            });
+
+        var userInfoVue = new Vue({
+          el: '#userInfo',
+          delimiters:['[[', ']]'],
+          data: {
+              userLogin: false,
+              username: ""
+          },
+
+          methods: {
+              logout: function (event) {
+                  $.ajax({
+                      url: serverLocation + "session/",
+                      method: "delete",
+                      contentType: "json",
+                      data: {},
+                      success: function (resp) {
+                          alert("成功登出!");
+                          window.location.reload()
+                      },
+                      error: function (resp) {
+                          alert(resp.responseText)
+                      }
+                  })
+              }
+          }
+        });
+
+        $.getJSON(serverLocation + "session/")
+            .success(function (resp) {
+                userInfoVue.username = resp.username;
+                userInfoVue.userLogin = true;
+            })
+    </script>
+</body>
+</html>

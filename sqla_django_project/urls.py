@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.urls import path
 from blog.views import *
 from blog.user_view import *
+from blog.article_api import *
+from blog.user_api import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,5 +27,18 @@ urlpatterns = [
     path('', lambda r: redirect("article-list")),
     path('article/', ArticleView.as_view()),
     path("post-article/", PostArticleView.as_view(),),
-    path("article-list/", ArticleListView.as_view(), name="article-list"),
+    path("article-list/", ArticleApiTemplateView.as_view(), name="article-list"),
 ]
+
+
+def api(url, api_view):
+    return path("api/"+url, api_view)
+
+
+apis = [
+    api("article/", ArticleApi.as_view()),
+    api("user/", UserApi.as_view()),
+    api("session/", SessionApi.as_view())
+]
+
+urlpatterns.extend(apis)

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>注册</title>
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <h1>注册新用户</h1>
+        </div>
+
+        <div class="row" id="container">
+            <form>
+                <div class="form-group">
+                    <label for="usernameInput">
+                        输入用户名：
+                        <input type="text" class="form-control" name="username" id="usernameInput" placeholder="长度大于5" v-model="username">
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="passwordInput">
+                        输入密码：
+                        <input type="password" class="form-control" name="password" id="passwordInput" placeholder="长度大于5" v-model="password">
+                    </label>
+                </div>
+            </form>
+            <button class="btn btn-primary" id="submitButton" value="提交" v-on:click="commit">提交</button>
+        </div>
+    </div>
+
+    <script>
+        var serverLocation = "/api/";
+        var vue = new Vue({
+          el: '#container',
+          delimiters:['[[', ']]'],
+          data: {
+            username: "",
+            password: ""
+          },
+            methods: {
+              commit: function(e){
+                  $.ajax({
+                      url: serverLocation + "user/",
+                      method: "post",
+                      dataType: "json",
+                      data: JSON.stringify({
+                          username: vue.username,
+                          password: vue.password
+                      })
+                  }).success(function (resp) {
+                      alert("注册成功!");
+                      window.location.href = "/login/"
+                  }).fail(function (resp) {
+                      alert(resp.responseText);
+                  })
+              }
+            }
+        });
+    </script>
+</body>
+</html>

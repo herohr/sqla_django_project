@@ -2,6 +2,8 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
 # Create your views here.
+from django.views.generic import TemplateView
+
 from blog.models import Article
 from blog.db import Session
 from django.shortcuts import render
@@ -74,3 +76,7 @@ class ArticleView(View):
             "create_time": article.create_time,
             "content": article.content
         })
+
+
+class ArticleApiTemplateView(TemplateView):
+    template_name = "article-list-api.html"

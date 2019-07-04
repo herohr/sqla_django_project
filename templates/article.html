@@ -8,24 +8,42 @@
     <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="container">
         <div class="row">
-            <h1 class="text-info">标题：{{ title }}</h1>
+            <h1 class="text-info">标题：[[ title ]]</h1>
             <div class="row page-header">
                 <div class="col-lg-2">
-                    <h2 class="text-info">{{ author }}</h2>
+                    <h2 class="text-info">[[ author ]]</h2>
                 </div>
                 <div class="col-lg-6">
-                    <h2 class="text-info">写于{{ create_time }}</h2>
+                    <h2 class="text-info">写于[[ create_time ]]</h2>
                 </div>
             </div>
         </div>
 
         <div class="row">
             <div class="col-lg-8">
-                {{ content|safe }}
+                [[ content ]]
             </div>
         </div>
     </div>
+
+<script>
+    var vue = new Vue({
+          el: '#container',
+          delimiters:['[[', ']]'],
+          data: {
+            articles: []
+          }
+        });
+        var serverLocation = "http://localhost:8000/api/";
+        $.getJSON(serverLocation + "article/id=?")
+            .done(function (data) {
+                console.log(data);
+                for (const article of data.articles) {
+                    vue.articles.push(article)
+                }
+        });
+</script>
 </body>
 </html>
